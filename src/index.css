@@ -1,0 +1,246 @@
+* {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+    display: flex;
+    justify-content: center;
+    background-color: #ffffff;
+}
+
+#root {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.map-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.map-container {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    aspect-ratio: 16/9;
+    height: 100%;
+    max-width: calc(100vh / (9/16));
+    max-height: calc(100vw / (16/9));
+    z-index: 10;
+    margin: auto;
+}
+
+.sidebar {
+    background-color: #ffffff;
+    color: #000000;
+    padding: 6px 12px;
+    font-family: monospace;
+    z-index: 100;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 8px;
+    border-radius: 4px;
+}
+
+.map-button {
+    z-index: 100;
+    height: 2.5em;
+    width: 2.5em;
+    margin: 6px;
+    background-color: #ffffff;
+    background-size: 24px 24px;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 4px;
+    outline: 0;
+    border: 0;
+    cursor: pointer;
+    box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.05), 0 0 6px 1px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+mapbox-search-box {
+    z-index: 100;
+    padding: 6px 12px;
+}
+
+.icon-compass {
+    background-image: url("/public/images/compass.svg");
+}
+
+.icon-download {
+    background-image: url("/public/images/download.svg");
+}
+
+.icon-edit {
+    background-image: url("/public/images/edit.svg");
+}
+
+.icon-globe {
+    background-image: url("/public/images/globe.svg");
+}
+
+.icon-delete {
+    background-image: url("/public/images/cross.svg");
+}
+
+.icon-help {
+    background-image: url("/public/images/help.svg");
+}
+
+.editor {
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 1000;
+    background-color: #ffffff;
+}
+
+.editor>canvas {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    margin: auto;
+    height: 100%;
+    max-width: calc(100vh / (9/16));
+    max-height: calc(100vw / (16/9));
+}
+
+.filters {
+    position: absolute;
+    right: 0;
+    height: auto;
+    width: 20em;
+    margin: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.filter-options {
+    display: flex;
+    width: 10em;
+    overflow: hidden;
+    flex-grow: 1;
+}
+
+.new-filter {
+    display: flex;
+    gap: 4px;
+}
+
+.filter-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.filter-list>li {
+    display: flex;
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 4px;
+    margin-bottom: 4px;
+    list-style: none;
+    padding: 0.2em;
+    text-transform: capitalize;
+    font-weight: bolder;
+    box-shadow: 0px 0px 2px 0px #000000;
+    cursor: default;
+    text-shadow: 0px 0px 2px #ffffff;
+}
+
+.filter-list>li:hover {
+    background-color: rgba(255, 255, 255, 1);
+}
+
+.filter {
+    font-weight: bolder;
+    text-transform: capitalize;
+    height: 2.5em;
+    border-radius: 4px;
+}
+
+.filter>option {
+    font-weight: bold;
+}
+
+.filter-button {
+    background-color: rgba(0, 0, 0, 0);
+    background-size: 12px 12px;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 4px;
+    outline: 0;
+    border: 0;
+    cursor: pointer;
+    width: 16px;
+}
+
+.filter-value {
+    flex-grow: 1;
+    white-space: nowrap;
+}
+
+.image-link {
+    position: absolute;
+    display: none;
+}
+
+.help {
+    display: flex;
+    position: absolute;
+    z-index: 2000;
+    background: rgba(255, 255, 255, 1);
+    border-radius: 4px;
+    padding: 8px;
+    flex-direction: column;
+    align-items: center;
+    font-weight: 500;
+}
+
+
+.help>span {
+    margin: 4px;
+}
+
+.bg {
+    position: absolute;
+    z-index: 1500;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    padding: 0;
+    margin: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.gotit {
+    width: fit-content;
+    margin-top: 1em;
+    font-weight: bold;
+}
+
+h1 {
+    display: inline;
+    background-color: #a6bdc2;
+    font-size: 14px;
+    font-family: monospace;
+    border-radius: 4px;
+    padding: 4px;
+    margin-left: 4px;
+    margin-right: 4px;
+}
