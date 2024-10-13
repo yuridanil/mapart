@@ -16,10 +16,13 @@ export default function App() {
   const [bearing, setBearing] = useState(getCookie('bearing', -6.999999999999318));
   const [inputValue, setInputValue] = useState("");
   const [showControls, setShowControls] = useState(true);
-  const [mode, setMode] = useState(getCookie('mode', 'map'));
+  const [showGrid, setShowGrid] = useState(false);
+  const [mode, setMode] = useState(getCookie('mode', 'editor'));
   const [filters, setFilters] = useState(getCookie('filters', []));
   const [filterValue, setFilterValue] = useState("");
   const [showHelp, setShowHelp] = useState(getCookie('showhelp', 1));
+  const [title, setTitle] = useState("Title");
+  const [desc, setDesc] = useState("Desc line 1\nDesc line 2");
   const availableFilters = new Map([
     ["brightness", [50, 0, 300, "%"]],
     ["contrast", [150, 0, 300, "%"]],
@@ -31,9 +34,14 @@ export default function App() {
     ["hue-rotate", [50, 0, 360, "deg"]],
     ["opacity", [50, 0, 100, "%"]]
   ]);
+  const gridLines = [16.66, 33.33, 50, 66.66, 83.33];
 
   const toggleControls = () => {
     setShowControls((showControls) => !showControls);
+  }
+
+  const toggleGrid = () => {
+    setShowGrid((showGrid) => !showGrid);
   }
 
   const handleKeyDown = (e) => {
@@ -148,6 +156,42 @@ export default function App() {
     setShowHelp(1);
   }
 
+  const handleGridClick = () => {
+    toggleGrid();
+  }
+
+  const handleUploadClick = () => {
+    let canvas = document.querySelector("#editorCanvas");
+    canvas.toBlob(function (blob) {
+      let o = {};
+      o.user_id = 1;
+      o.title = title;
+      o.desc = desc;
+      o.width = canvas.width;
+      o.height = canvas.height;
+      o.lat = map.current.getCenter().lat;
+      o.lng = map.current.getCenter().lng;
+      o.zoom = map.current.getZoom();
+      o.bearing = map.current.getBearing();
+      o.filters = filters.map((e) => e.filter + "(" + e.value + e.units + ")").join(" ");
+      const formData = new FormData();
+      formData.append('filedata', blob, encodeURI(JSON.stringify(o)));
+      fetch('http://localhost:3001/upload', {
+        method: 'POST',
+        body: formData
+      })
+        .then((response) => response.text())
+        .then((resp) => {
+          let r = JSON.parse(resp);
+          if (r.result === "ok")
+            console.log(r.filename);
+          // setCookie('mode', 'gallery');
+          // setCookie('image_id', 'gallery');
+          // document.location.reload();
+        });
+    }, 'image/jpeg');
+  }
+
   useEffect(() => {
     drawImage();
   }, [filters]);
@@ -213,12 +257,24 @@ export default function App() {
         {showControls && <div className="sidebar">Longitude: {parseFloat(lng).toFixed(4)} | Latitude: {parseFloat(lat).toFixed(4)} | Zoom: {parseFloat(zoom).toFixed(2)} | Bearing: {parseFloat(bearing).toFixed(2)}</div>}
         {showControls && <button className='map-button icon-edit' onClick={handleCreateClick} />}
         {showControls && <button className='map-button icon-compass' onClick={handleCompassClick} />}
+        {showControls && <button className='map-button icon-grid' onClick={handleGridClick} />}
         {showControls && <button className='map-button icon-help' onClick={handleHelpClick} />}
+        {showControls && showGrid && <div className='grid-container'>
+          {gridLines.map((x) => <>
+            <div key={x} className='grid grid-v' style={{ 'left': `${x}%` }}></div>
+            <div key={x} className='grid grid-h' style={{ 'top': `${x}%` }}></div>
+          </>)}
+        </div>}
         {<div className='editor' style={{ visibility: mode === 'editor' ? 'visible' : 'hidden' }}>
           <canvas id="editorCanvas" />
           <button className='map-button icon-globe' onClick={handleMapClick} />
           <button className='map-button icon-download' onClick={handleDownloadClick} />
+          <button className='map-button icon-upload' onClick={handleUploadClick} >Upload</button>
           <a className='image-link'></a>
+          <div className='image-info'>
+            <input className='image-title' type='text' placeholder='Title' value={title} onChange={(e) => setTitle(e.target.value)} />
+            <textarea className='image-description' placeholder='Description' value={desc} onChange={(e) => setDesc(e.target.value)} />
+          </div>
           <div className='filters'>
             <select className='filter' name="cars" id="cars" value={filterValue} onChange={handleFilterSelect}>
               <option value="" disabled>Add filter</option>

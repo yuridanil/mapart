@@ -39,14 +39,18 @@ body {
 .sidebar {
     background-color: #ffffff;
     color: #000000;
-    padding: 6px 12px;
     font-family: monospace;
     z-index: 100;
     position: absolute;
     top: 0;
     left: 0;
+    height: 2.5em;
+    line-height: 2.5em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
     margin: 8px;
     border-radius: 4px;
+    opacity: 0.7;
 }
 
 .map-button {
@@ -92,6 +96,10 @@ mapbox-search-box {
 
 .icon-help {
     background-image: url("/public/images/help.svg");
+}
+
+.icon-grid {
+    background-image: url("/public/images/grid.svg");
 }
 
 .editor {
@@ -243,4 +251,76 @@ h1 {
     padding: 4px;
     margin-left: 4px;
     margin-right: 4px;
+}
+
+
+.image-info {
+    position: absolute;
+    left: 0;
+    height: auto;
+    width: 20em;
+    margin: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+
+.image-title {
+    height: 2em;
+    outline: none;
+    border-radius: 4px;
+    border: 0;
+    box-shadow: 0px 0px 2px 0px #000000;
+    padding: 4px;
+}
+
+.image-description {
+    resize: none;
+    outline: none;
+    height: 2em;
+    border-radius: 4px;
+    border: 0;
+    box-shadow: 0px 0px 2px 0px #000000;
+    overflow: hidden;
+}
+
+.image-description:focus {
+    height: 25em;
+    overflow: auto;
+}
+
+.grid-container {
+    pointer-events: none;
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    aspect-ratio: 16/9;
+    height: 100%;
+    max-width: calc(100vh / (9/16));
+    max-height: calc(100vw / (16/9));
+    z-index: 50;
+    margin: auto;
+}
+
+.grid {
+    pointer-events: none;
+    position: absolute;
+    border-left: 1px solid #ffffff;
+    border-top: 1px solid #ffffff;
+    border-right: 1px solid #000000;
+    border-bottom: 1px solid #000000;
+    opacity: 0.5;
+}
+
+.grid-h {
+    height: 1px;
+    left: 0px;
+    right: 0px;
+}
+
+.grid-v {
+    width: 1px;
+    top: 0px;
+    bottom: 0px;
 }
