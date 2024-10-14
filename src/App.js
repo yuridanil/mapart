@@ -21,6 +21,8 @@ export default function App() {
   const [filters, setFilters] = useState(getCookie('filters', []));
   const [filterValue, setFilterValue] = useState("");
   const [showHelp, setShowHelp] = useState(getCookie('showhelp', 1));
+  const [showToast, setShowToast] = useState(false);
+  const [toastText, setToastText] = useState("-");
   const [title, setTitle] = useState("Title");
   const [desc, setDesc] = useState("Desc line 1\nDesc line 2");
   const availableFilters = new Map([
@@ -42,6 +44,12 @@ export default function App() {
 
   const toggleGrid = () => {
     setShowGrid((showGrid) => !showGrid);
+  }
+
+  const toggleLayer = () => {
+    if (map.current) {
+      map.current.setStyle(map.current.style.globalId  === 'mapbox://styles/mapbox/satellite-v9' ? 'mapbox://styles/mapbox/satellite-streets-v12' : 'mapbox://styles/mapbox/satellite-v9');
+    }
   }
 
   const handleKeyDown = (e) => {
@@ -160,6 +168,10 @@ export default function App() {
     toggleGrid();
   }
 
+  const handleLayerClick = () => {
+    toggleLayer();
+  }
+
   const handleUploadClick = () => {
     let canvas = document.querySelector("#editorCanvas");
     canvas.toBlob(function (blob) {
@@ -183,11 +195,17 @@ export default function App() {
         .then((response) => response.text())
         .then((resp) => {
           let r = JSON.parse(resp);
-          if (r.result === "ok")
+          if (r.result === "ok")  {
             console.log(r.filename);
+            setToastText("Image Uploaded");
+            setShowToast(true);
+            setTimeout(() => {
+              setShowToast(false);
+            }, 5000);
           // setCookie('mode', 'gallery');
           // setCookie('image_id', 'gallery');
           // document.location.reload();
+        }
         });
     }, 'image/jpeg');
   }
@@ -258,6 +276,7 @@ export default function App() {
         {showControls && <button className='map-button icon-edit' onClick={handleCreateClick} />}
         {showControls && <button className='map-button icon-compass' onClick={handleCompassClick} />}
         {showControls && <button className='map-button icon-grid' onClick={handleGridClick} />}
+        {showControls && <button className='map-button icon-layer' onClick={handleLayerClick} />}
         {showControls && <button className='map-button icon-help' onClick={handleHelpClick} />}
         {showControls && showGrid && <div className='grid-container'>
           {gridLines.map((x) => <>
@@ -306,6 +325,7 @@ export default function App() {
           </div>
         </div>
       }
+      {showToast && <div className='toast'>{toastText}</div>}
     </>
   );
 }

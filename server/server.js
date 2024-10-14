@@ -1,9 +1,11 @@
+const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mysql = require('mysql');
 const multer = require('multer');
 const cors = require("cors");
+const imageThumbnail = require('image-thumbnail');
 
 // Starting our app.
 const app = express();
@@ -70,19 +72,24 @@ app.post('/upload', upload.single('filedata'), (req, res) => {
     }
 
     else {
+        let options = { percentage: 20 };
+        imageThumbnail('uploads/' + req.file.filename, options)
+        .then(thumbnail => {
+            fs.writeFile('uploads/thumbs/' + req.file.filename, thumbnail, function (err) {
+                if (err) throw err;
+                console.log('Replaced!');
+              });
+        })
+        .catch(err => console.error(err));
         console.log("Файл загружен");
         res.send({"result": "ok", "filename": req.file.filename});
     }
 })
 
-
 // Starting our server.
 app.listen(3001, () => {
     console.log('Go to http://localhost:3001/images so you can see the data.');
 });
-
-
-
 
 // request handlers
 /*
