@@ -15,13 +15,16 @@ const connection = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: 'root123',
-    database: 'mapart'
+    database: 'mapart',
+    connectionLimit : 100
 });
 
 // Creating a GET route that returns data from the 'users' table.
 app.get('/images', function (req, res) {
+    console.log('get images')
     connection.getConnection(function (err, connection) {
-        let sql = "SELECT concat('uploads/', id, '.jpg') as original, concat('uploads/', id, '.jpg') as thumbnail,"
+        let sql = "SELECT id, title, `desc`, lat, lng, zoom, bearing, user_id, filters, likes, shown, width, height, category, tags,"
+            + " concat(id, '.jpg') as filename, concat('uploads/', id, '.jpg') as original, concat('uploads/thumbs/', id, '.jpg') as thumbnail,"
             + " title as originalTitle"
             + " FROM images order by id desc";
         connection.query(sql, function (error, results, fields) {
@@ -34,7 +37,7 @@ app.get('/images', function (req, res) {
 const getFilename = () => { }
 
 const storage = multer.diskStorage({
-    destination: "./uploads",
+    destination: "./public/uploads",
     filename (req, file, callback) {
         let o = JSON.parse( decodeURI(file.originalname));
         connection.getConnection(function (err, connection) {
@@ -72,10 +75,10 @@ app.post('/upload', upload.single('filedata'), (req, res) => {
     }
 
     else {
-        let options = { percentage: 20 };
-        imageThumbnail('uploads/' + req.file.filename, options)
+        let options = { width: 300, height: 300, fit: "inside" };
+        imageThumbnail('public/uploads/' + req.file.filename, options)
         .then(thumbnail => {
-            fs.writeFile('uploads/thumbs/' + req.file.filename, thumbnail, function (err) {
+            fs.writeFile('public/uploads/thumbs/' + req.file.filename, thumbnail, function (err) {
                 if (err) throw err;
                 console.log('Replaced!');
               });
@@ -109,3 +112,16 @@ app.get('/', (req, res) => {
 });
 */
 
+/*
+https://www.npmjs.com/package/image-thumbnail
+image-thumbnail options:
+percentage [0-100] - image thumbnail percentage. Default = 10
+width [number] - image thumbnail width.
+height [number] - image thumbnail height.
+responseType ['buffer' || 'base64'] - response output type. Default = 'buffer'
+jpegOptions [0-100] - Example: { force:true, quality:100 }
+fit [string] - method by which the image should fit the width/height. Default = contain (details)
+failOnError [boolean] - Set to false to avoid read problems for images from some phones (i.e Samsung) in the sharp lib. Default = true (details)
+withMetaData [boolean] - Keep metadata in the thumbnail (will increase file size)
+flattenBackgroundColor [background colour] - parsed by the color module, defaults to #ffffff.
+*/
