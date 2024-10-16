@@ -6,14 +6,14 @@ export default function Gallery() {
 
     const [images, setImages] = useState([]);
     const [imageId, setImageId] = useState(getCookie("image_id"));
+    const [imageTitle, setImageTitle] = useState("");
 
-    const handleClick = () => {
+    const handleMapClick = () => {
         setCookie('mode', 'map');
         document.location.reload();
     }
 
     const handleImageClick = (e) => {
-        console.log(e);
         setImageId(e.target.id);
     }
 
@@ -38,13 +38,23 @@ export default function Gallery() {
     }, [])
 
     return (
-        <><div><button onClick={handleClick}>Return</button></div>
-            <div className='image-gallery'>
-                {images.map((x) =>
+        <>
+            <div className='gal-header'>
+                <button className='map-button icon-globe' onClick={handleMapClick} />
+            </div>
+            <div className='gal-content'>
+                {images.map((x) => <div className='gal-img-wrap'>
                     <img id={x.filename} key={x.id} className='gal-image' src={x.thumbnail} onClick={handleImageClick} />
+                    <div className='gal-title'>{x.title}</div>
+                </div>
+
                 )}
             </div>
-            {imageId !== undefined && <div className='image-open' onClick={handleCloseImageClick}><img className='gal-image-open' src={'uploads/' + imageId} /></div>}
+            {imageId !== undefined &&
+                <div className='image-open' onClick={handleCloseImageClick}>
+                    <img className='gal-image-open' src={'uploads/' + imageId} />
+                    <div className='gal-title'>{imageTitle}</div>
+                </div>}
         </>
     )
 }
