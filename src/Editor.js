@@ -23,8 +23,8 @@ export default function Editor() {
   const [showHelp, setShowHelp] = useState(getCookie('showhelp', 1));
   const [showToast, setShowToast] = useState(false);
   const [toastText, setToastText] = useState("-");
-  const [title, setTitle] = useState("Title");
-  const [desc, setDesc] = useState("Desc line 1\nDesc line 2");
+  const [title, setTitle] = useState("");
+  const [desc, setDesc] = useState("");
   const availableFilters = new Map([
     ["brightness", [50, 0, 300, "%"]],
     ["contrast", [150, 0, 300, "%"]],
@@ -48,7 +48,7 @@ export default function Editor() {
 
   const toggleLayer = () => {
     if (map.current) {
-      map.current.setStyle(map.current.style.globalId  === 'mapbox://styles/mapbox/satellite-v9' ? 'mapbox://styles/mapbox/satellite-streets-v12' : 'mapbox://styles/mapbox/satellite-v9');
+      map.current.setStyle(map.current.style.globalId === 'mapbox://styles/mapbox/satellite-v9' ? 'mapbox://styles/mapbox/satellite-streets-v12' : 'mapbox://styles/mapbox/satellite-v9');
     }
   }
 
@@ -195,19 +195,24 @@ export default function Editor() {
         .then((response) => response.text())
         .then((resp) => {
           let r = JSON.parse(resp);
-          if (r.result === "ok")  {
-            console.log(r.filename);
+          if (r.result === "ok") {
             setToastText("Image Uploaded");
             setShowToast(true);
             setTimeout(() => {
               setShowToast(false);
             }, 5000);
-          setCookie('mode', 'gallery');
-          setCookie('image_id', r.filename);
-          document.location.reload();
-        }
+            setCookie('image_id', r.id);
+            setCookie('mode', 'gallery');
+            document.location.reload();
+          }
         });
     }, 'image/jpeg');
+  }
+
+  const handleGalleryClick = () => {
+    setCookie('image_id', undefined);
+    setCookie('mode', 'gallery');
+    document.location.reload();
   }
 
   useEffect(() => {
@@ -277,6 +282,7 @@ export default function Editor() {
         {showControls && <button className='map-button icon-compass' onClick={handleCompassClick} />}
         {showControls && <button className='map-button icon-grid' onClick={handleGridClick} />}
         {showControls && <button className='map-button icon-layer' onClick={handleLayerClick} />}
+        {showControls && <button className='map-button icon-gallery' onClick={handleGalleryClick} />}
         {showControls && <button className='map-button icon-help' onClick={handleHelpClick} />}
         {showControls && showGrid && <div className='grid-container'>
           {gridLines.map((x) => <>

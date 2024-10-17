@@ -24,8 +24,7 @@ app.get('/images', function (req, res) {
     console.log('get images')
     connection.getConnection(function (err, connection) {
         let sql = "SELECT id, title, `desc`, lat, lng, zoom, bearing, user_id, filters, likes, shown, width, height, category, tags,"
-            + " concat(id, '.jpg') as filename, concat('uploads/', id, '.jpg') as original, concat('uploads/thumbs/', id, '.jpg') as thumbnail,"
-            + " title as originalTitle"
+            + " concat(id, '.jpg') as filename, concat('uploads/', id, '.jpg') as original, concat('uploads/thumbs/', id, '.jpg') as thumbnail"
             + " FROM images order by id desc";
         connection.query(sql, function (error, results, fields) {
             if (error) throw error;
@@ -85,7 +84,8 @@ app.post('/upload', upload.single('filedata'), (req, res) => {
         })
         .catch(err => console.error(err));
         console.log("Файл загружен");
-        res.send({"result": "ok", "filename": req.file.filename});
+        console.log(path.parse(req.file.filename).name);
+        res.send({"result": "ok", "filename": req.file.filename, "id": path.parse(req.file.filename).name});
     }
 })
 

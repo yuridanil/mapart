@@ -107,6 +107,18 @@ mapbox-search-box {
     background-image: url("/public/images/layer.svg");
 }
 
+.icon-gallery {
+    background-image: url("/public/images/gallery.svg");
+}
+
+.icon-like {
+    background-image: url("/public/images/like.svg");
+}
+
+.icon-dislike {
+    background-image: url("/public/images/dislike.svg");
+}
+
 .editor {
     display: flex;
     justify-content: center;
