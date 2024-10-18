@@ -2,10 +2,9 @@ import React, { useRef, useEffect, useState } from 'react';
 import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
 import { getCookie, setCookie } from './utils.js';
 import { SearchBox } from "@mapbox/search-js-react";
+import { accessToken } from './token.js';
 
-const accessToken = "pk.eyJ1IjoieXVyaWRhbmlsIiwiYSI6ImNra2kybTNmczIwanUydnBhMXQ0ODN1cGcifQ.4r0FSLXI_ygefe3gHm84yg";
-
-export default function Editor() {
+export default function Editor({setGlobalMode, globalMode}) {
 
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -173,6 +172,16 @@ export default function Editor() {
   }
 
   const handleUploadClick = () => {
+    if (title.trim() === "") {
+      setTitle("");
+      document.querySelector(".image-title").focus();
+      return;
+    } else if (desc.trim() === "") {
+      setDesc("");
+      document.querySelector(".image-description").focus();
+      return;
+    }
+
     let canvas = document.querySelector("#editorCanvas");
     canvas.toBlob(function (blob) {
       let o = {};
@@ -200,10 +209,9 @@ export default function Editor() {
             setShowToast(true);
             setTimeout(() => {
               setShowToast(false);
-            }, 5000);
+              setGlobalMode("gallery");
+            }, 2000);
             setCookie('image_id', r.id);
-            setCookie('mode', 'gallery');
-            document.location.reload();
           }
         });
     }, 'image/jpeg');
@@ -211,8 +219,7 @@ export default function Editor() {
 
   const handleGalleryClick = () => {
     setCookie('image_id', undefined);
-    setCookie('mode', 'gallery');
-    document.location.reload();
+    setGlobalMode("gallery");
   }
 
   useEffect(() => {

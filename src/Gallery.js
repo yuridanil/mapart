@@ -2,15 +2,14 @@ import React, { useRef, useEffect, useState } from 'react';
 import { getCookie, setCookie } from './utils.js';
 import './Gallery.css';
 
-export default function Gallery() {
+export default function Gallery({ setGlobalMode, globalMode }) {
 
     const [images, setImages] = useState([]);
     const [imageId, setImageId] = useState(getCookie("image_id"));
     const [imageIdx, setImageIdx] = useState(-1);
 
     const handleMapClick = () => {
-        setCookie('mode', 'map');
-        document.location.reload();
+        setGlobalMode("map");
     }
 
     const handleImageClick = (e) => {
@@ -36,7 +35,6 @@ export default function Gallery() {
         })
             .then((response) => response.text())
             .then((resp) => {
-                // console.log(resp);
                 let r = JSON.parse(resp);
                 setImages(r);
                 let idx = r.findIndex((x) => x.id == imageId);
