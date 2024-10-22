@@ -6,17 +6,18 @@ const mysql = require('mysql');
 const multer = require('multer');
 const cors = require("cors");
 const imageThumbnail = require('image-thumbnail');
+const creds = require('./creds');
 
 // Starting our app.
 const app = express();
 app.use(cors());
 
 const connection = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: 'root123',
-    database: 'mapart',
-    connectionLimit : 100
+    host: creds.MYSQL_HOST,
+    user: creds.MYSQL_USER,
+    password: creds.MYSQL_PASS,
+    database: creds.MYSQL_DB,
+    connectionLimit: 100
 });
 
 // Creating a GET route that returns data from the 'users' table.
@@ -37,8 +38,8 @@ const getFilename = () => { }
 
 const storage = multer.diskStorage({
     destination: "./public/uploads",
-    filename (req, file, callback) {
-        let o = JSON.parse( decodeURI(file.originalname));
+    filename(req, file, callback) {
+        let o = JSON.parse(decodeURI(file.originalname));
         connection.getConnection(function (err, connection) {
             connection.query('INSERT INTO images SET ?', {
                 user_id: o.user_id,
@@ -69,23 +70,22 @@ app.post('/upload', upload.single('filedata'), (req, res) => {
     let filedata = req.file;
 
     if (!filedata) {
-        console.log("Ошибка при загрузке файла");
-        res.send("Ошибка при загрузке файла");
+        console.log("Error uploading file");
+        res.send({ "result": "error" });
     }
 
     else {
         let options = { width: 300, height: 300, fit: "inside" };
         imageThumbnail('public/uploads/' + req.file.filename, options)
-        .then(thumbnail => {
-            fs.writeFile('public/uploads/thumbs/' + req.file.filename, thumbnail, function (err) {
-                if (err) throw err;
-                console.log('Replaced!');
-              });
-        })
-        .catch(err => console.error(err));
-        console.log("Файл загружен");
-        console.log(path.parse(req.file.filename).name);
-        res.send({"result": "ok", "filename": req.file.filename, "id": path.parse(req.file.filename).name});
+            .then(thumbnail => {
+                fs.writeFile('public/uploads/thumbs/' + req.file.filename, thumbnail, function (err) {
+                    if (err) throw err;
+                    console.log('Thumb created');
+                });
+            })
+            .catch(err => console.error(err));
+        console.log("File uploaded. id=" + path.parse(req.file.filename).name);
+        res.send({ "result": "ok", "filename": req.file.filename, "id": path.parse(req.file.filename).name });
     }
 })
 

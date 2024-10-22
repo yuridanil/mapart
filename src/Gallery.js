@@ -2,17 +2,16 @@ import React, { useRef, useEffect, useState } from 'react';
 import { getCookie, setCookie } from './utils.js';
 import './Gallery.css';
 
-export default function Gallery({ setGlobalMode, globalMode }) {
-
+export default function Gallery({setGlobalMode, globalMode, setImageId, imageId, mapOptions, setMapOptions}) {
+    let img;
     const [images, setImages] = useState([]);
-    const [imageId, setImageId] = useState(getCookie("image_id"));
     const [imageIdx, setImageIdx] = useState(-1);
 
     const handleMapClick = () => {
         setGlobalMode("map");
     }
 
-    const handleImageClick = (e) => {
+    const handleOpenImageClick = (e) => {
         let i = images.findIndex((x) => x.id == e.target.id);
         setImageIdx(i);
     }
@@ -21,15 +20,60 @@ export default function Gallery({ setGlobalMode, globalMode }) {
         setImageIdx(undefined);
     }
 
-    const handleWheel = (e) => {
-        if (e.deltaY < 0 && imageIdx > 0)
+    const prevImage = () => {
+        if (imageIdx > 0) {
             setImageIdx(imageIdx - 1);
-        else if (e.deltaY > 0 && imageIdx < images.length - 1) {
-            setImageIdx(imageIdx + 1);
         }
     }
 
+    const nextImage = () => {
+        if (imageIdx < images.length - 1)
+            setImageIdx(imageIdx + 1);
+    }
+
+    const handleWheel = (e) => {
+        if (e.deltaY < 0)
+            prevImage();
+        else if (e.deltaY > 0)
+            nextImage();
+    }
+
     useEffect(() => {
+        const handleKeyDown = (e) => {
+            // console.log(e);
+            if (imageIdx !== undefined) {
+                switch (e.key) {
+                    case "ArrowRight":
+                    case "PageDown":
+                        nextImage();
+                        e.stopPropagation();
+                        e.preventDefault();
+                        break;
+                    case "ArrowLeft":
+                    case "PageUp":
+                        prevImage();
+                        e.stopPropagation();
+                        e.preventDefault();
+                        break;
+                    case "Escape":
+                        handleCloseImageClick();
+                        e.stopPropagation();
+                        e.preventDefault();
+                    default:
+                        break;
+                }
+            }
+        };
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+
+    }, [imageIdx]);
+
+    useEffect(() => {
+        console.log(imageId);
         fetch('http://localhost:3001/images', {
             method: 'GET'
         })
@@ -49,14 +93,13 @@ export default function Gallery({ setGlobalMode, globalMode }) {
     return (
         <>
             <div className='gal-header'>
-                <button className='map-button icon-globe' onClick={handleMapClick} />
+                <button className='map-button icon-globe' onClick={handleMapClick} title='Open map' />
             </div>
             <div className='gal-content'>
                 {images.map((x) => <div key={'d1' + x.id} className='gal-img-wrap'>
-                    <img id={x.id} key={x.id} className='gal-image' src={x.thumbnail} onClick={handleImageClick} title={"<p>" + x.title + "</p><p>" + x.desc + "</p>"} />
+                    <img id={x.id} key={x.id} className='gal-image' src={x.thumbnail} onClick={handleOpenImageClick} title={"<p>" + x.title + "</p><p>" + x.desc + "</p>"} />
                     <div key={'d2' + x.id} className='gal-title'>{x.title}</div>
                 </div>
-
                 )}
             </div>
             {(imageIdx !== undefined && imageIdx > -1 && images.length > 0) &&
@@ -65,7 +108,11 @@ export default function Gallery({ setGlobalMode, globalMode }) {
                         <p className='gal-title-open'>{images[imageIdx].title}</p>
                         <p className='gal-desc-open'>{images[imageIdx].desc}</p>
                         <div className='likes'>
-                            <button className='map-button icon-like' onClick={e => { console.log("like"); e.stopPropagation(); }} />
+                            <button className='map-button icon-like' onClick={e => {
+                                setMapOptions({ lat: images[imageIdx].lat, lng: images[imageIdx].lng, zoom: images[imageIdx].zoom, bearing: images[imageIdx].bearing });
+                                e.stopPropagation();
+                                setGlobalMode("map");
+                            }} />
                             <p>{images[imageIdx].likes}</p>
                             <button className='map-button icon-dislike' onClick={e => { console.log("dislike"); e.stopPropagation(); }} />
                         </div>

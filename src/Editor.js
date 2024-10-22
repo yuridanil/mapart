@@ -4,15 +4,15 @@ import { getCookie, setCookie } from './utils.js';
 import { SearchBox } from "@mapbox/search-js-react";
 import { accessToken } from './token.js';
 
-export default function Editor({setGlobalMode, globalMode}) {
+export default function Editor({setGlobalMode, globalMode, setImageId, imageId, mapOptions, setMapOptions}) {
 
   const mapContainer = useRef(null);
   const map = useRef(null);
 
-  const [lng, setLng] = useState(getCookie('lng', -118.40846694274578));
-  const [lat, setLat] = useState(getCookie('lat', 33.93743834974455));
-  const [zoom, setZoom] = useState(getCookie('zoom', 18.715823602858986));
-  const [bearing, setBearing] = useState(getCookie('bearing', -6.999999999999318));
+  const [lng, setLng] = useState(mapOptions.lng);
+  const [lat, setLat] = useState(mapOptions.lat);
+  const [zoom, setZoom] = useState(mapOptions.zoom);
+  const [bearing, setBearing] = useState(mapOptions.bearing);
   const [inputValue, setInputValue] = useState("");
   const [showControls, setShowControls] = useState(true);
   const [showGrid, setShowGrid] = useState(false);
@@ -207,18 +207,19 @@ export default function Editor({setGlobalMode, globalMode}) {
           if (r.result === "ok") {
             setToastText("Image Uploaded");
             setShowToast(true);
+            console.log(r.id);
             setTimeout(() => {
               setShowToast(false);
               setGlobalMode("gallery");
-            }, 2000);
-            setCookie('image_id', r.id);
+            }, 3000);
+            setImageId(r.id);
           }
         });
     }, 'image/jpeg');
   }
 
   const handleGalleryClick = () => {
-    setCookie('image_id', undefined);
+    setImageId(undefined);
     setGlobalMode("gallery");
   }
 
@@ -232,11 +233,12 @@ export default function Editor({setGlobalMode, globalMode}) {
     document.addEventListener("keydown", handleKeyDown, true);
 
     mapboxgl.accessToken = accessToken;
-
+    console.log("new map");
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/satellite-v9',
-      center: [lng, lat],
+      // center: [lng, lat],
+      center: [mapOptions.lng, mapOptions.lat],
       zoom: zoom,
       bearing: bearing,
       preserveDrawingBuffer: true,
@@ -285,12 +287,12 @@ export default function Editor({setGlobalMode, globalMode}) {
         />}
         {<div ref={mapContainer} className="map-container" />}
         {showControls && <div className="sidebar">Longitude: {parseFloat(lng).toFixed(4)} | Latitude: {parseFloat(lat).toFixed(4)} | Zoom: {parseFloat(zoom).toFixed(2)} | Bearing: {parseFloat(bearing).toFixed(2)}</div>}
-        {showControls && <button className='map-button icon-edit' onClick={handleCreateClick} />}
-        {showControls && <button className='map-button icon-compass' onClick={handleCompassClick} />}
-        {showControls && <button className='map-button icon-grid' onClick={handleGridClick} />}
-        {showControls && <button className='map-button icon-layer' onClick={handleLayerClick} />}
-        {showControls && <button className='map-button icon-gallery' onClick={handleGalleryClick} />}
-        {showControls && <button className='map-button icon-help' onClick={handleHelpClick} />}
+        {showControls && <button className='map-button icon-edit' onClick={handleCreateClick} title='Edit & publish'/>}
+        {showControls && <button className='map-button icon-compass' onClick={handleCompassClick} title='Set north'/>}
+        {showControls && <button className='map-button icon-grid' onClick={handleGridClick} title='Show gridlines'/>}
+        {showControls && <button className='map-button icon-label' onClick={handleLayerClick} title='Toggle labels'/>}
+        {showControls && <button className='map-button icon-gallery' onClick={handleGalleryClick} title='Open gallery'/>}
+        {showControls && <button className='map-button icon-help' onClick={handleHelpClick} title='Show help'/>}
         {showControls && showGrid && <div className='grid-container'>
           {gridLines.map((x) => <>
             <div key={`x1`} className='grid grid-v' style={{ 'left': `${x}%` }}></div>
@@ -299,9 +301,9 @@ export default function Editor({setGlobalMode, globalMode}) {
         </div>}
         {<div className='editor' style={{ visibility: mode === 'editor' ? 'visible' : 'hidden' }}>
           <canvas id="editorCanvas" />
-          <button className='map-button icon-globe' onClick={handleMapClick} />
-          <button className='map-button icon-download' onClick={handleDownloadClick} />
-          <button className='map-button icon-upload' onClick={handleUploadClick} >Upload</button>
+          <button className='map-button icon-globe' onClick={handleMapClick}  title='Go to map'/>
+          {false && <button className='map-button icon-download' onClick={handleDownloadClick}/>}
+          <button className='map-button icon-upload' onClick={handleUploadClick} title='Upload to gallery'/>
           <a className='image-link'></a>
           <div className='image-info'>
             <input className='image-title' type='text' placeholder='Title' value={title} onChange={(e) => setTitle(e.target.value)} />

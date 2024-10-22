@@ -1,7 +1,8 @@
 .gal-image {
-    box-shadow:
-        1px 1px 3px 2px #000000;
+    box-shadow: 1px 1px 3px 2px #000000;
     cursor: pointer;
+    width: 300px;
+    aspect-ratio: 16/9;
 }
 
 
@@ -12,12 +13,15 @@
 
 .gal-header {
     position: absolute;
+    display: flex;
     left: 0;
     right: 0;
     top: 0;
     height: 3em;
     background-color: #ffffff;
     justify-content: center;
+    box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.5);
+    z-index: 50;
 }
 
 
@@ -33,6 +37,7 @@
     bottom: 0;
     overflow: auto;
     user-select: none;
+    z-index: 10;
 }
 
 .gal-title {
@@ -107,6 +112,8 @@
     color: #ffffff;
     font-family: "Comic Sans MS", "Comic Sans";
     font-style: italic;
+    background-color: rgba(0, 0, 0, 0.8);
+    box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.8);
     text-shadow: -1px 1px 2px #000,
         1px 1px 2px #000,
         1px -1px 2px #000,

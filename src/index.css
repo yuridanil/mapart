@@ -107,6 +107,10 @@ mapbox-search-box {
     background-image: url("/public/images/layer.svg");
 }
 
+.icon-label {
+    background-image: url("/public/images/label.svg");
+}
+
 .icon-gallery {
     background-image: url("/public/images/gallery.svg");
 }
@@ -117,6 +121,10 @@ mapbox-search-box {
 
 .icon-dislike {
     background-image: url("/public/images/dislike.svg");
+}
+
+.icon-upload {
+    background-image: url("/public/images/upload.svg");
 }
 
 .editor {
