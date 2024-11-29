@@ -1,5 +1,5 @@
 node_modules/
-uploads/*.jpg
-uploads/thumbs/*
+public/uploads/*.*
+public/uploads/thumbs/*.*
 src/token.js
 server/creds.js
