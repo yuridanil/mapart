@@ -3,8 +3,8 @@ import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-load
 import { getCookie, setCookie } from './utils.js';
 import { SearchBox } from "@mapbox/search-js-react";
 import { accessToken } from './token.js';
-
-export default function Editor({setGlobalMode, globalMode, setImageId, imageId, mapOptions, setMapOptions}) {
+import './Editor.css';
+export default function Editor({ setGlobalMode, globalMode, setImageId, imageId, mapOptions, setMapOptions }) {
 
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -24,6 +24,14 @@ export default function Editor({setGlobalMode, globalMode, setImageId, imageId, 
   const [toastText, setToastText] = useState("-");
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
+
+  const [focusedTitle, setFocusedTitle] = React.useState(false)
+  const onFocusTitle = () => setFocusedTitle(true)
+  const onBlurTitle = () => setFocusedTitle(false)
+  const [focusedDesc, setFocusedDesc] = React.useState(false)
+  const onFocusDesc = () => setFocusedDesc(true)
+  const onBlurDesc = () => setFocusedDesc(false)
+
   const availableFilters = new Map([
     ["brightness", [50, 0, 300, "%"]],
     ["contrast", [150, 0, 300, "%"]],
@@ -172,6 +180,7 @@ export default function Editor({setGlobalMode, globalMode, setImageId, imageId, 
   }
 
   const handleUploadClick = () => {
+
     if (title.trim() === "") {
       setTitle("");
       document.querySelector(".image-title").focus();
@@ -233,7 +242,6 @@ export default function Editor({setGlobalMode, globalMode, setImageId, imageId, 
     document.addEventListener("keydown", handleKeyDown, true);
 
     mapboxgl.accessToken = accessToken;
-    console.log("new map");
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/satellite-v9',
@@ -287,12 +295,12 @@ export default function Editor({setGlobalMode, globalMode, setImageId, imageId, 
         />}
         {<div ref={mapContainer} className="map-container" />}
         {showControls && <div className="sidebar">Longitude: {parseFloat(lng).toFixed(4)} | Latitude: {parseFloat(lat).toFixed(4)} | Zoom: {parseFloat(zoom).toFixed(2)} | Bearing: {parseFloat(bearing).toFixed(2)}</div>}
-        {showControls && <button className='map-button icon-edit' onClick={handleCreateClick} title='Edit & publish'/>}
-        {showControls && <button className='map-button icon-compass' onClick={handleCompassClick} title='Set north'/>}
-        {showControls && <button className='map-button icon-grid' onClick={handleGridClick} title='Show gridlines'/>}
-        {showControls && <button className='map-button icon-label' onClick={handleLayerClick} title='Toggle labels'/>}
-        {showControls && <button className='map-button icon-gallery' onClick={handleGalleryClick} title='Open gallery'/>}
-        {showControls && <button className='map-button icon-help' onClick={handleHelpClick} title='Show help'/>}
+        {showControls && <button className='map-button icon-edit' onClick={handleCreateClick} title='Edit & publish' />}
+        {showControls && <button className='map-button icon-compass' onClick={handleCompassClick} title='Set north' />}
+        {showControls && <button className='map-button icon-grid' onClick={handleGridClick} title='Show gridlines' />}
+        {showControls && <button className='map-button icon-label' onClick={handleLayerClick} title='Toggle labels' />}
+        {showControls && <button className='map-button icon-gallery' onClick={handleGalleryClick} title='Open gallery' />}
+        {showControls && <button className='map-button icon-help' onClick={handleHelpClick} title='Show help' />}
         {showControls && showGrid && <div className='grid-container'>
           {gridLines.map((x) => <>
             <div key={`x1`} className='grid grid-v' style={{ 'left': `${x}%` }}></div>
@@ -301,13 +309,19 @@ export default function Editor({setGlobalMode, globalMode, setImageId, imageId, 
         </div>}
         {<div className='editor' style={{ visibility: mode === 'editor' ? 'visible' : 'hidden' }}>
           <canvas id="editorCanvas" />
-          <button className='map-button icon-globe' onClick={handleMapClick}  title='Go to map'/>
-          {false && <button className='map-button icon-download' onClick={handleDownloadClick}/>}
-          <button className='map-button icon-upload' onClick={handleUploadClick} title='Upload to gallery'/>
+          <button className='map-button icon-globe' onClick={handleMapClick} title='Go to map' />
+          {false && <button className='map-button icon-download' onClick={handleDownloadClick} />}
+          <button className='map-button icon-upload' onClick={handleUploadClick} title='Upload to gallery' />
           <a className='image-link'></a>
           <div className='image-info'>
-            <input className='image-title' type='text' placeholder='Title' value={title} onChange={(e) => setTitle(e.target.value)} />
-            <textarea className='image-description' placeholder='Description' value={desc} onChange={(e) => setDesc(e.target.value)} />
+            <span className='input-wrapper'>
+              <input className='image-title' type='text' placeholder='Title' value={title} onChange={(e) => setTitle(e.target.value)} onFocus={onFocusTitle} onBlur={onBlurTitle} />
+              {title === "" && focusedTitle && <p className='hint-bubble'>Please specify title</p>}
+            </span>
+            <span className='input-wrapper'>
+            <textarea className='image-description' placeholder='Description' value={desc} onChange={(e) => setDesc(e.target.value)} onFocus={onFocusDesc} onBlur={onBlurDesc} />
+            {desc === "" && focusedDesc && <p className='hint-bubble'>Please specify description</p>}
+            </span>
           </div>
           <div className='filters'>
             <select className='filter' name="cars" id="cars" value={filterValue} onChange={handleFilterSelect}>

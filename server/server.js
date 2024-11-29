@@ -44,7 +44,7 @@ const storage = multer.diskStorage({
             connection.query('INSERT INTO images SET ?', {
                 user_id: o.user_id,
                 title: o.title,
-                desc: decodeURI(o.desc),
+                desc: o.desc,
                 lat: o.lat,
                 lng: o.lng,
                 zoom: o.zoom,
