@@ -1,1 +1,1 @@
-export const accessToken = "<YOUR_MAPBOX_TOKEN_HERE>";
+export const accessToken = "<YOUR ACCESS TOKEN HERE>";

@@ -2,7 +2,6 @@ const MYSQL_HOST = 'localhost';
 const MYSQL_DB = 'mapart';
 const MYSQL_USER = 'mapart';
 const MYSQL_PASS = 'mapart';
-
 module.exports = {
     MYSQL_HOST,
     MYSQL_DB,
