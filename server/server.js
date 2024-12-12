@@ -75,7 +75,7 @@ app.post('/upload', upload.single('filedata'), (req, res) => {
     }
 
     else {
-        let options = { width: 300, height: 300, fit: "inside" };
+        let options = { width: 350, height: 350, fit: "inside" };
         imageThumbnail('public/uploads/' + req.file.filename, options)
             .then(thumbnail => {
                 fs.writeFile('public/uploads/thumbs/' + req.file.filename, thumbnail, function (err) {

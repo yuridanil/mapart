@@ -4,7 +4,7 @@ import Gallery from './Gallery';
 import { getCookie, setCookie } from './utils.js';
 
 export default function App2() {
-  const [mode, setMode] = useState('gallery');
+  const [mode, setMode] = useState('map');
   const [imageId, setImageId] = useState(undefined);
   const [mapOptions, setMapOptions] = useState({
     lng: getCookie('lng', -118.40846694274578),

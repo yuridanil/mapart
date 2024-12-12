@@ -91,7 +91,7 @@ export default function Gallery({ setGlobalMode, globalMode, setImageId, imageId
 
     return (
         <>
-            <div className='gal-header'>
+            <div className='controlbar top-right'>
                 <button className='map-button icon-globe' onClick={handleMapClick} title='Open map' />
             </div>
             <div className='gal-content'>
@@ -109,7 +109,7 @@ export default function Gallery({ setGlobalMode, globalMode, setImageId, imageId
                             e.stopPropagation();
                             setGlobalMode("map");
                         }}>{images[imageIdx].title || 'Untitled'}</p>
-                        <p className='gal-desc-open'>{images[imageIdx].desc || 'Undescribed'}</p>
+                        { false &&<p className='gal-desc-open'>{images[imageIdx].desc || 'Undescribed'}</p> }
                         <div className='likes'>
                             <button className='map-button icon-like' onClick={e => { console.log("dislike"); e.stopPropagation(); }} />
                             <p>{images[imageIdx].likes}</p>

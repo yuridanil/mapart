@@ -185,11 +185,12 @@ export default function Editor({ setGlobalMode, globalMode, setImageId, imageId,
       setTitle("");
       document.querySelector(".image-title").focus();
       return;
-    } else if (desc.trim() === "") {
-      setDesc("");
-      document.querySelector(".image-description").focus();
-      return;
-    }
+    } 
+    // else if (desc.trim() === "") {
+    //   setDesc("");
+    //   document.querySelector(".image-description").focus();
+    //   return;
+    // }
 
     let canvas = document.querySelector("#editorCanvas");
     canvas.toBlob(function (blob) {
@@ -294,13 +295,28 @@ export default function Editor({ setGlobalMode, globalMode, setImageId, imageId,
           }}
         />}
         {<div ref={mapContainer} className="map-container" />}
+
+        {showControls && <div className='controlbar top-right'>
+          {mode === 'map' && <>
+            <button className='map-button icon-compass' onClick={handleCompassClick} title='Set north' />
+            <button className='map-button icon-grid' onClick={handleGridClick} title='Show gridlines' />
+            <button className='map-button icon-label' onClick={handleLayerClick} title='Toggle labels' />
+            <button className='map-button icon-edit' onClick={handleCreateClick} title='Edit & publish' />
+            <button className='map-button icon-gallery' onClick={handleGalleryClick} title='Open gallery' />
+          </>}
+          {mode === 'editor' && <>
+            <button className='map-button icon-upload' onClick={handleUploadClick} title='Upload to gallery' />
+            <button className='map-button icon-globe' onClick={handleMapClick} title='Go to map' />
+          </>}
+
+        </div>}
+
+        {showControls && <div className='controlbar bottom-right'>
+          <button className='map-button icon-help' onClick={handleHelpClick} title='Show help' />
+        </div>}
+
         {showControls && <div className="sidebar">Longitude: {parseFloat(lng).toFixed(4)} | Latitude: {parseFloat(lat).toFixed(4)} | Zoom: {parseFloat(zoom).toFixed(2)} | Bearing: {parseFloat(bearing).toFixed(2)}</div>}
-        {showControls && <button className='map-button icon-edit' onClick={handleCreateClick} title='Edit & publish' />}
-        {showControls && <button className='map-button icon-compass' onClick={handleCompassClick} title='Set north' />}
-        {showControls && <button className='map-button icon-grid' onClick={handleGridClick} title='Show gridlines' />}
-        {showControls && <button className='map-button icon-label' onClick={handleLayerClick} title='Toggle labels' />}
-        {showControls && <button className='map-button icon-gallery' onClick={handleGalleryClick} title='Open gallery' />}
-        {showControls && <button className='map-button icon-help' onClick={handleHelpClick} title='Show help' />}
+
         {showControls && showGrid && <div className='grid-container'>
           {gridLines.map((x) => <>
             <div key={`x1`} className='grid grid-v' style={{ 'left': `${x}%` }}></div>
@@ -309,20 +325,29 @@ export default function Editor({ setGlobalMode, globalMode, setImageId, imageId,
         </div>}
         {<div className='editor' style={{ visibility: mode === 'editor' ? 'visible' : 'hidden' }}>
           <canvas id="editorCanvas" />
-          <button className='map-button icon-globe' onClick={handleMapClick} title='Go to map' />
+
           {false && <button className='map-button icon-download' onClick={handleDownloadClick} />}
-          <button className='map-button icon-upload' onClick={handleUploadClick} title='Upload to gallery' />
-          <a className='image-link'></a>
-          <div className='image-info'>
+
+          {/* <a className='image-link'></a> */}
+
+          {showControls && <div className='controlbar top'>
+            <span className='input-wrapper'>
+              <input className='image-title' type='text' placeholder='Title' value={title} onChange={(e) => setTitle(e.target.value)} onFocus={onFocusTitle} onBlur={onBlurTitle} />
+              {title === "" && focusedTitle && <p className='hint-bubble'>Please specify title</p>}
+            </span>
+          </div>}
+
+          {/* <div className='image-info'>
             <span className='input-wrapper'>
               <input className='image-title' type='text' placeholder='Title' value={title} onChange={(e) => setTitle(e.target.value)} onFocus={onFocusTitle} onBlur={onBlurTitle} />
               {title === "" && focusedTitle && <p className='hint-bubble'>Please specify title</p>}
             </span>
             <span className='input-wrapper'>
-            <textarea className='image-description' placeholder='Description' value={desc} onChange={(e) => setDesc(e.target.value)} onFocus={onFocusDesc} onBlur={onBlurDesc} />
-            {desc === "" && focusedDesc && <p className='hint-bubble'>Please specify description</p>}
+              <textarea className='image-description' placeholder='Description' value={desc} onChange={(e) => setDesc(e.target.value)} onFocus={onFocusDesc} onBlur={onBlurDesc} />
+              {desc === "" && focusedDesc && <p className='hint-bubble'>Please specify description</p>}
             </span>
-          </div>
+          </div> */}
+
           <div className='filters'>
             <select className='filter' name="cars" id="cars" value={filterValue} onChange={handleFilterSelect}>
               <option value="" disabled>Add filter</option>
@@ -354,6 +379,7 @@ export default function Editor({ setGlobalMode, globalMode, setImageId, imageId,
           </div>
         </div>
       }
+
       {showToast && <div className='toast'>{toastText}</div>}
     </>
   );
