@@ -183,7 +183,11 @@ export default function Editor({ setGlobalMode, globalMode, setImageId, imageId,
 
     if (title.trim() === "") {
       setTitle("");
-      document.querySelector(".image-title").focus();
+      let i = document.querySelector(".image-title");
+      i.classList.add("red");
+      i.onAnimationEnd = null;
+      i.addEventListener("animationend", () => {i.classList.remove("red");});
+      i.focus();
       return;
     } 
     // else if (desc.trim() === "") {
@@ -333,7 +337,6 @@ export default function Editor({ setGlobalMode, globalMode, setImageId, imageId,
           {showControls && <div className='controlbar top'>
             <span className='input-wrapper'>
               <input className='image-title' type='text' placeholder='Title' value={title} onChange={(e) => setTitle(e.target.value)} onFocus={onFocusTitle} onBlur={onBlurTitle} />
-              {title === "" && focusedTitle && <p className='hint-bubble'>Please specify title</p>}
             </span>
           </div>}
 
