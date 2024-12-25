@@ -22,7 +22,8 @@ const connection = mysql.createPool({
 
 // Creating a GET route that returns data from the 'users' table.
 app.get('/images', function (req, res) {
-    console.log('get images')
+    console.log('get images');
+
     connection.getConnection(function (err, connection) {
         let sql = "SELECT id, title, `desc`, lat, lng, zoom, bearing, user_id, filters, likes, shown, width, height, category, tags,"
             + " concat(id, '.jpg') as filename, concat('uploads/', id, '.jpg') as original, concat('uploads/thumbs/', id, '.jpg') as thumbnail"
@@ -37,7 +38,7 @@ app.get('/images', function (req, res) {
 const getFilename = () => { }
 
 const storage = multer.diskStorage({
-    destination: "./public/uploads",
+    destination: "./build/uploads",
     filename(req, file, callback) {
         let o = JSON.parse(decodeURI(file.originalname));
         connection.getConnection(function (err, connection) {
@@ -76,9 +77,9 @@ app.post('/upload', upload.single('filedata'), (req, res) => {
 
     else {
         let options = { width: 350, height: 350, fit: "inside" };
-        imageThumbnail('public/uploads/' + req.file.filename, options)
+        imageThumbnail('./build/uploads/' + req.file.filename, options)
             .then(thumbnail => {
-                fs.writeFile('public/uploads/thumbs/' + req.file.filename, thumbnail, function (err) {
+                fs.writeFile('./build/uploads/thumbs/' + req.file.filename, thumbnail, function (err) {
                     if (err) throw err;
                     console.log('Thumb created');
                 });
@@ -89,9 +90,12 @@ app.post('/upload', upload.single('filedata'), (req, res) => {
     }
 })
 
+app.use(express.static('build'));
+
 // Starting our server.
-app.listen(3001, () => {
-    console.log('Go to http://localhost:3001/images so you can see the data.');
+app.listen(8080, () => {
+    console.log('Go to http://localhost:8080/ to open the App');
+    console.log('Go to http://localhost:8080/images so you can see the data.');
 });
 
 // request handlers

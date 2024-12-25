@@ -211,7 +211,7 @@ export default function Editor({ setGlobalMode, globalMode, setImageId, imageId,
       o.filters = filters.map((e) => e.filter + "(" + e.value + e.units + ")").join(" ");
       const formData = new FormData();
       formData.append('filedata', blob, encodeURI(JSON.stringify(o)));
-      fetch('http://localhost:3001/upload', {
+      fetch('http://localhost:8080/upload', {
         method: 'POST',
         body: formData
       })

@@ -73,7 +73,7 @@ export default function Gallery({ setGlobalMode, globalMode, setImageId, imageId
 
     useEffect(() => {
         console.log(imageId);
-        fetch('http://localhost:3001/images', {
+        fetch('http://localhost:8080/images', {
             method: 'GET'
         })
             .then((response) => response.text())
