@@ -6,33 +6,32 @@ const mysql = require('mysql');
 const multer = require('multer');
 const cors = require("cors");
 const imageThumbnail = require('image-thumbnail');
-const creds = require('./creds');
 
 // Starting our app.
 const app = express();
 app.use(cors());
 
-const connection = mysql.createPool({
-    host: creds.MYSQL_HOST,
-    user: creds.MYSQL_USER,
-    password: creds.MYSQL_PASS,
-    database: creds.MYSQL_DB,
-    connectionLimit: 100
-});
+const pool = require('./db');
+const SCHEMA = 'mapart';
+
 
 // Creating a GET route that returns data from the 'users' table.
-app.get('/images', function (req, res) {
+app.get('/images', async function (req, res) {
     console.log('get images');
+    let sql = '', message = 'ok', status = 200, result, rows = [];
 
-    connection.getConnection(function (err, connection) {
-        let sql = "SELECT id, title, `desc`, lat, lng, zoom, bearing, user_id, filters, likes, shown, width, height, category, tags,"
-            + " concat(id, '.jpg') as filename, concat('uploads/', id, '.jpg') as original, concat('uploads/thumbs/', id, '.jpg') as thumbnail"
-            + " FROM images order by id desc";
-        connection.query(sql, function (error, results, fields) {
-            if (error) throw error;
-            res.send(results);
-        });
-    });
+    try {
+        sql = `SELECT id, title, "desc", lat, lng, zoom, bearing, user_id, filters, likes, shown, width, height, category, tags,
+            concat(id, '.jpg') as filename, concat('uploads/', id, '.jpg') as original, concat('uploads/thumbs/', id, '.jpg') as thumbnail
+            FROM ${SCHEMA}.images order by id desc`;
+        result = await pool.query(sql, []);
+    } catch (err) {
+        status = 500;
+        message = "unknownerror";
+        console.log(err);
+    } finally {
+        res.status(status).json(result.rows);
+    }
 });
 
 const getFilename = () => { }
@@ -41,27 +40,27 @@ const storage = multer.diskStorage({
     destination: "./build/uploads",
     filename(req, file, callback) {
         let o = JSON.parse(decodeURI(file.originalname));
-        connection.getConnection(function (err, connection) {
-            connection.query('INSERT INTO images SET ?', {
-                user_id: o.user_id,
-                title: o.title,
-                desc: o.desc,
-                lat: o.lat,
-                lng: o.lng,
-                zoom: o.zoom,
-                bearing: o.bearing,
-                width: o.width,
-                height: o.height,
-                filters: o.filters
-            }, function (error, results, fields) {
-                if (error)
-                    throw error;
-                callback(null, results.insertId.toString() + '.jpg');
-            });
+        let sql = `INSERT INTO ${SCHEMA}.images (user_id, title, "desc", lat, lng, zoom, bearing, width, height, filters)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        RETURNING id`;
+        pool.query(sql, [
+            o.user_id,
+            o.title,
+            o.desc,
+            o.lat,
+            o.lng,
+            o.zoom,
+            o.bearing,
+            o.width,
+            o.height,
+            o.filters
+        ], function (err, results) {
+            if (err)
+                throw err;
+            callback(null, results.rows[0].id + '.jpg');
         });
     }
 });
-
 
 const upload = multer({ storage })
 
@@ -79,7 +78,7 @@ app.post('/upload', upload.single('filedata'), (req, res) => {
         let options = { width: 350, height: 350, fit: "inside" };
         imageThumbnail('./build/uploads/' + req.file.filename, options)
             .then(thumbnail => {
-                fs.writeFile('./build/uploads/thumbs/' + req.file.filename, thumbnail, function (err) {
+                fs.writeFile(__dirname + '/../build/uploads/thumbs/' + req.file.filename, thumbnail, function (err) {
                     if (err) throw err;
                     console.log('Thumb created');
                 });
