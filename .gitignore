@@ -4,3 +4,5 @@ public/uploads/thumbs/*.jpg
 src/token.js
 server/creds.js
 build/
+server/uploads/*.jpg
+server/uploads/thumbs/*.jpg

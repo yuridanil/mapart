@@ -37,7 +37,7 @@ app.get('/images', async function (req, res) {
 const getFilename = () => { }
 
 const storage = multer.diskStorage({
-    destination: "./build/uploads",
+    destination: path.join(__dirname, 'uploads'),
     filename(req, file, callback) {
         let o = JSON.parse(decodeURI(file.originalname));
         let sql = `INSERT INTO ${SCHEMA}.images (user_id, title, "desc", lat, lng, zoom, bearing, width, height, filters)
@@ -76,9 +76,9 @@ app.post('/upload', upload.single('filedata'), (req, res) => {
 
     else {
         let options = { width: 350, height: 350, fit: "inside" };
-        imageThumbnail('./build/uploads/' + req.file.filename, options)
+        imageThumbnail(path.join(__dirname, 'uploads', req.file.filename), options)
             .then(thumbnail => {
-                fs.writeFile(__dirname + '/../build/uploads/thumbs/' + req.file.filename, thumbnail, function (err) {
+                fs.writeFile(path.join(__dirname, 'uploads', 'thumbs', req.file.filename), thumbnail, function (err) {
                     if (err) throw err;
                     console.log('Thumb created');
                 });
@@ -128,3 +128,14 @@ failOnError [boolean] - Set to false to avoid read problems for images from some
 withMetaData [boolean] - Keep metadata in the thumbnail (will increase file size)
 flattenBackgroundColor [background colour] - parsed by the color module, defaults to #ffffff.
 */
+
+
+app.get('/image', async function (req, res) {
+    // console.log('get image', req.query);
+    let sql = '', message = 'ok', status = 200, result, rows = [];
+    let filename = path.join(__dirname, 'uploads', req.query.t === '1' ? 'thumbs': '', req.query.id || 'template.jpg') + '.jpg';
+    // console.log(filename);
+    if (!fs.existsSync(filename))
+        filename = path.join(__dirname, 'uploads', 'template.jpg');
+    res.status(status).sendFile(filename);
+});

@@ -9,13 +9,14 @@ export default function Gallery({ setGlobalMode, globalMode, setImageId, imageId
         setGlobalMode("map");
     }
 
-    const handleOpenImageClick = (e) => {
-        let i = images.findIndex((x) => x.id === parseInt(e.target.id));
-        setImageIdx(i);
+    const handleOpenImageClick = (id) => {
+        // let i = images.findIndex((x) => x.id === parseInt(e.target.id));
+        console.log(id);
+        setImageIdx(parseInt(id));
     }
 
     const handleCloseImageClick = () => {
-        setImageIdx(undefined);
+        setImageIdx(-1);
     }
 
     const prevImage = () => {
@@ -78,6 +79,7 @@ export default function Gallery({ setGlobalMode, globalMode, setImageId, imageId
         })
             .then((response) => response.text())
             .then((resp) => {
+                console.log(resp);
                 let r = JSON.parse(resp);
                 setImages(r);
                 let idx = r.findIndex((x) => x.id === imageId);
@@ -95,15 +97,15 @@ export default function Gallery({ setGlobalMode, globalMode, setImageId, imageId
                 <button className='map-button icon-globe' onClick={handleMapClick} title='Open map' />
             </div>
             <div className='gal-content'>
-                {images.map((x) => <div key={'d1' + x.id} className='gal-img-wrap'>
-                    <img id={x.id} key={x.id} className='gal-image' src={x.thumbnail} onClick={handleOpenImageClick} title={"<p>" + x.title + "</p><p>" + x.desc + "</p>"} alt={x.title} />
+                {images.map((x, idx) => <div key={'d1' + x.id} className='gal-img-wrap'>
+                    <img id={x.id} key={x.id} className='gal-image' src={`http://localhost:8080/image?t=1&id=${x.id}`} onClick={() => handleOpenImageClick(idx)} title={"<p>" + x.title + "</p><p>" + x.desc + "</p>"} alt={x.title} />
                     <div key={'d2' + x.id} className='gal-title'>{x.title || 'Untitled'}</div>
                 </div>
                 )}
             </div>
-            {(imageIdx !== undefined && imageIdx > -1 && images.length > 0) &&
+            {(imageIdx > -1) &&
                 <div className='image-open' onClick={handleCloseImageClick} onWheel={handleWheel}>
-                    <div className='gal-img-wrap-open' style={{ backgroundImage: `url(${'uploads/' + images[imageIdx].filename})` }}>
+                    <div className='gal-img-wrap-open' style={{ backgroundImage: `url(http://localhost:8080/image?id=${images[imageIdx].id}` }}>
                         <p className='gal-title-open' onClick={e => {
                             setMapOptions({ lat: images[imageIdx].lat, lng: images[imageIdx].lng, zoom: images[imageIdx].zoom, bearing: images[imageIdx].bearing });
                             e.stopPropagation();
