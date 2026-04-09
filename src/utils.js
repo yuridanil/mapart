@@ -14,8 +14,9 @@ export function setCookie(name, value) {
 
 export function getCookie(name, defaultValue) {
     var matches = document.cookie.match(new RegExp(
-        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        "(?:^|; )" + name.replace(/([.$?*|{}()[\]\\/+^])/g, '\\$1') + "=([^;]*)"
     ));
     return matches ? decodeURIComponent(matches[1]) : defaultValue;
 }
 
+export const IMAGE_FORMATS = ['16/9', '3/2'];

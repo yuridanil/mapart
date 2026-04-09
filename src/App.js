@@ -3,7 +3,7 @@ import Editor from './Editor';
 import Gallery from './Gallery';
 import { getCookie, setCookie } from './utils.js';
 
-export default function App2() {
+export default function App() {
   const [mode, setMode] = useState('map');
   const [imageId, setImageId] = useState(undefined);
   const [mapOptions, setMapOptions] = useState({

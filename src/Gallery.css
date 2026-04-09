@@ -2,9 +2,8 @@
     box-shadow: 1px 1px 3px 2px #000000;
     cursor: pointer;
     width: 350px;
-    aspect-ratio: 16/9;
+    aspect-ratio: var(--image-format);
 }
-
 
 .gal-image-open {
     width: 100%;

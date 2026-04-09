@@ -103,8 +103,8 @@ h1 {
     bottom: 0px;
     margin: auto;
     height: 100%;
-    max-width: calc(100vh / (9/16));
-    max-height: calc(100vw / (16/9));
+    max-width: calc(100vh * var(--image-format));
+    max-height: calc(100vw / var(--image-format));
 }
 
 .filters {
@@ -226,19 +226,6 @@ h1 {
     font-weight: bold;
 }
 
-.grid-container {
-    pointer-events: none;
-    position: absolute;
-    top: 0px;
-    bottom: 0px;
-    aspect-ratio: 16/9;
-    height: 100%;
-    max-width: calc(100vh / (9/16));
-    max-height: calc(100vw / (16/9));
-    z-index: 50;
-    margin: auto;
-}
-
 @keyframes bgChange {
 
     0%,
@@ -260,4 +247,73 @@ h1 {
     background-color: #ffffff;
     animation-name: bgChange;
     animation-duration: 1s;
+}
+
+.grid-container {
+    pointer-events: none;
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    aspect-ratio: var(--image-format);
+    height: 100%;
+    max-width: calc(100vh * var(--image-format));
+    max-height: calc(100vw / var(--image-format));
+    z-index: 50;
+    margin: auto;
+}
+
+.map-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.map-container {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    aspect-ratio: var(--image-format);
+    height: 100%;
+    max-width: calc(100vh * var(--image-format));
+    max-height: calc(100vw / var(--image-format));
+    z-index: 10;
+    margin: auto;
+}
+
+.sidebar {
+    background-color: #ffffff;
+    color: #000000;
+    font-family: monospace;
+    z-index: 100;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 2.5em;
+    line-height: 2.5em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    margin: 8px;
+    border-radius: 4px;
+    opacity: 0.7;
+}
+
+.map-button {
+    z-index: 100;
+    height: 2.5em;
+    width: 2.5em;
+    background-color: #ffffff;
+    background-size: 24px 24px;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 4px;
+    outline: 0;
+    border: 0;
+    cursor: pointer;
+    box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.05), 0 0 6px 1px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+mapbox-search-box {
+    z-index: 100;
+    padding: 6px 12px;
 }

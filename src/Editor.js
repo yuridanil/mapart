@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
-import { getCookie, setCookie } from './utils.js';
+import { getCookie, setCookie, IMAGE_FORMATS } from './utils.js';
 import { SearchBox } from "@mapbox/search-js-react";
 import { accessToken } from './token.js';
 import './Editor.css';
@@ -15,7 +15,7 @@ export default function Editor({ setGlobalMode, globalMode, setImageId, imageId,
   const [bearing, setBearing] = useState(mapOptions.bearing);
   const [inputValue, setInputValue] = useState("");
   const [showControls, setShowControls] = useState(true);
-  const [showGrid, setShowGrid] = useState(false);
+  const [showGrid, setShowGrid] = useState(parseInt(getCookie('showgrid', 0)));
   const [mode, setMode] = useState(getCookie('mode', 'map'));
   const [filters, setFilters] = useState(getCookie('filters', []));
   const [filterValue, setFilterValue] = useState("");
@@ -24,13 +24,14 @@ export default function Editor({ setGlobalMode, globalMode, setImageId, imageId,
   const [toastText, setToastText] = useState("-");
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
+  const [formatIndex, setFormatIndex] = useState(parseInt(getCookie('format', 0)));
 
   const [focusedTitle, setFocusedTitle] = React.useState(false)
   const onFocusTitle = () => setFocusedTitle(true)
   const onBlurTitle = () => setFocusedTitle(false)
-  const [focusedDesc, setFocusedDesc] = React.useState(false)
-  const onFocusDesc = () => setFocusedDesc(true)
-  const onBlurDesc = () => setFocusedDesc(false)
+  // const [focusedDesc, setFocusedDesc] = React.useState(false)
+  // const onFocusDesc = () => setFocusedDesc(true)
+  // const onBlurDesc = () => setFocusedDesc(false)
 
   const availableFilters = new Map([
     ["brightness", [50, 0, 300, "%"]],
@@ -50,7 +51,7 @@ export default function Editor({ setGlobalMode, globalMode, setImageId, imageId,
   }
 
   const toggleGrid = () => {
-    setShowGrid((showGrid) => !showGrid);
+    setShowGrid((showGrid) => 1 - showGrid);
   }
 
   const toggleLayer = () => {
@@ -73,15 +74,16 @@ export default function Editor({ setGlobalMode, globalMode, setImageId, imageId,
           map.current.setBearing(map.current.getBearing() + .1);
           break;
         case "ArrowUp":
-          map.current.setZoom(map.current.getZoom() * 1.001);
+          map.current.setZoom(map.current.getZoom() * 1.0005);
           break;
         case "ArrowDown":
-          map.current.setZoom(map.current.getZoom() / 1.001);
+          map.current.setZoom(map.current.getZoom() / 1.0005);
           break;
         default:
           break;
       }
     } else if (!e.ctrlKey && !e.altKey && e.shiftKey) {
+      // console.log(e);
       switch (e.code) {
         case "ArrowLeft":
           map.current.setBearing(map.current.getBearing() - 5);
@@ -94,6 +96,19 @@ export default function Editor({ setGlobalMode, globalMode, setImageId, imageId,
           break;
         case "ArrowDown":
           map.current.setZoom(map.current.getZoom() / 1.01);
+          break;
+        case "PageUp":
+          map.current.setBearing(map.current.getBearing() - .1);
+          console.log('bear');
+          break;
+        case "PageDown":
+          map.current.setBearing(map.current.getBearing() + .1);
+          break;
+        case "Home":
+          map.current.setZoom(map.current.getZoom() * 1.0005);
+          break;
+        case "End":
+          map.current.setZoom(map.current.getZoom() / 1.0005);
           break;
         default:
           break;
@@ -186,10 +201,10 @@ export default function Editor({ setGlobalMode, globalMode, setImageId, imageId,
       let i = document.querySelector(".image-title");
       i.classList.add("red");
       i.onAnimationEnd = null;
-      i.addEventListener("animationend", () => {i.classList.remove("red");});
+      i.addEventListener("animationend", () => { i.classList.remove("red"); });
       i.focus();
       return;
-    } 
+    }
     // else if (desc.trim() === "") {
     //   setDesc("");
     //   document.querySelector(".image-description").focus();
@@ -236,6 +251,27 @@ export default function Editor({ setGlobalMode, globalMode, setImageId, imageId,
     setImageId(undefined);
     setGlobalMode("gallery");
   }
+
+  const handleFormatClick = () => {
+    if (formatIndex < IMAGE_FORMATS.length - 1)
+      setFormatIndex(oldFormatIndex => oldFormatIndex + 1);
+    else
+      setFormatIndex(0);
+    const root = document.querySelector(":root");
+    root.style.setProperty("--image-format", "calc(" + IMAGE_FORMATS[formatIndex] + ")");
+  }
+
+  const handleFullscreenClick = () => {
+    window.document.body.requestFullscreen();
+  }
+
+  useEffect(() => {
+    setCookie('showgrid', showGrid);
+    setCookie('format', formatIndex);
+    const root = document.querySelector(":root");
+    root.style.setProperty("--image-format", "calc(" + IMAGE_FORMATS[formatIndex] + ")");
+    console.log(showGrid);
+  }, [showGrid, formatIndex]);
 
   useEffect(() => {
     drawImage();
@@ -302,11 +338,13 @@ export default function Editor({ setGlobalMode, globalMode, setImageId, imageId,
 
         {showControls && <div className='controlbar top-right'>
           {mode === 'map' && <>
+            <button className='map-button icon-format' onClick={handleFormatClick} title='Format' />
             <button className='map-button icon-compass' onClick={handleCompassClick} title='Set north' />
             <button className='map-button icon-grid' onClick={handleGridClick} title='Show gridlines' />
+            <button className='map-button icon-fullscreen' onClick={handleFullscreenClick} title='Fullscreen' />
             <button className='map-button icon-label' onClick={handleLayerClick} title='Toggle labels' />
-            <button className='map-button icon-edit' onClick={handleCreateClick} title='Edit & publish' />
             <button className='map-button icon-gallery' onClick={handleGalleryClick} title='Open gallery' />
+            <button className='map-button icon-edit' onClick={handleCreateClick} title='Edit & publish' />
           </>}
           {mode === 'editor' && <>
             <button className='map-button icon-upload' onClick={handleUploadClick} title='Upload to gallery' />
@@ -321,10 +359,10 @@ export default function Editor({ setGlobalMode, globalMode, setImageId, imageId,
 
         {showControls && <div className="sidebar">Longitude: {parseFloat(lng).toFixed(4)} | Latitude: {parseFloat(lat).toFixed(4)} | Zoom: {parseFloat(zoom).toFixed(2)} | Bearing: {parseFloat(bearing).toFixed(2)}</div>}
 
-        {showControls && showGrid && <div className='grid-container'>
-          {gridLines.map((x) => <>
-            <div key={`x1`} className='grid grid-v' style={{ 'left': `${x}%` }}></div>
-            <div key={`x2`} className='grid grid-h' style={{ 'top': `${x}%` }}></div>
+        {showControls && showGrid === 1 && <div className='grid-container'>
+          {gridLines.map((x, i) => <>
+            <div key={`x1${i}`} className='grid grid-v' style={{ 'left': `${x}%` }}></div>
+            <div key={`x2${i}`} className='grid grid-h' style={{ 'top': `${x}%` }}></div>
           </>)}
         </div>}
         {<div className='editor' style={{ visibility: mode === 'editor' ? 'visible' : 'hidden' }}>
@@ -375,9 +413,9 @@ export default function Editor({ setGlobalMode, globalMode, setImageId, imageId,
             <span>Move map: <h1>↑</h1><h1>↓</h1><h1>←</h1><h1>→</h1></span>
             <span>Zoom map: <h1>+</h1><h1>-</h1></span>
             <span>Zoom map (small): <h1>Shift ↑</h1><h1>Shift ↓</h1></span>
-            <span>Zoom map (micro): <h1>Ctrl ↑</h1><h1>Ctrl ↓</h1></span>
+            <span>Zoom map (micro): <h1>Ctrl ↑</h1><h1>Ctrl ↓</h1> (<h1>Shift Home</h1><h1>Shift End</h1>)</span>
             <span>Rotate map (small): <h1>Shift ←</h1><h1>Shift →</h1></span>
-            <span>Rotate map (micro): <h1>Ctrl ←</h1><h1>Ctrl →</h1></span>
+            <span>Rotate map (micro): <h1>Ctrl ←</h1><h1>Ctrl →</h1> (<h1>Shift PgUp</h1><h1>Shift PgDn</h1>)</span>
             <button className='gotit' onClick={handleCloseHelpClick}>Got it!</button>
           </div>
         </div>
