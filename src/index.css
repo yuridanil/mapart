@@ -83,15 +83,20 @@ body {
     background-image: url("/public/images/fullscreen.svg");
 }
 
+.icon-fullscreen-exit {
+    background-image: url("/public/images/fullscreen-exit.svg");
+}
+
 .controlbar {
+    display: flex;
+    flex-wrap: nowrap;
     background: rgba(0, 0, 0, 0);
     border-radius: 4px;
     position: absolute;
-    display: flex;
-    flex-wrap: nowrap;
     gap: 0.5em;
     z-index: 1000;
-    margin: 0.5em 1.2em 0.5em 0.5em ;
+    margin: 0.5em 1.2em 0.5em 0.5em;
+    align-items: center;
 }
 
 .top-right {

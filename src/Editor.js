@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
-import { getCookie, setCookie, IMAGE_FORMATS } from './utils.js';
+import { getCookie, setCookie, IMAGE_FORMATS, IMAGE_FORMAT_NAMES } from './utils.js';
 import { SearchBox } from "@mapbox/search-js-react";
 import { accessToken } from './token.js';
 import './Editor.css';
@@ -254,23 +254,22 @@ export default function Editor({ setGlobalMode, globalMode, setImageId, imageId,
 
   const handleFormatClick = () => {
     if (formatIndex < IMAGE_FORMATS.length - 1)
-      setFormatIndex(oldFormatIndex => oldFormatIndex + 1);
+      setCookie('format', formatIndex + 1);
     else
-      setFormatIndex(0);
-    const root = document.querySelector(":root");
-    root.style.setProperty("--image-format", "calc(" + IMAGE_FORMATS[formatIndex] + ")");
+      setCookie('format', 0);
+    window.location.reload();
   }
 
   const handleFullscreenClick = () => {
-    window.document.body.requestFullscreen();
+    if (document.fullscreenElement)
+      document.exitFullscreen();
+    else
+      document.body.requestFullscreen();
   }
 
   useEffect(() => {
     setCookie('showgrid', showGrid);
     setCookie('format', formatIndex);
-    const root = document.querySelector(":root");
-    root.style.setProperty("--image-format", "calc(" + IMAGE_FORMATS[formatIndex] + ")");
-    console.log(showGrid);
   }, [showGrid, formatIndex]);
 
   useEffect(() => {
@@ -286,7 +285,6 @@ export default function Editor({ setGlobalMode, globalMode, setImageId, imageId,
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/satellite-v9',
-      // center: [lng, lat],
       center: [mapOptions.lng, mapOptions.lat],
       zoom: zoom,
       bearing: bearing,
@@ -324,7 +322,7 @@ export default function Editor({ setGlobalMode, globalMode, setImageId, imageId,
 
   return (
     <>
-      <div className='map-wrapper'>
+      <div className='map-wrapper' style={{ "--image-format": `calc(${IMAGE_FORMATS[formatIndex]})` }}>
         {showControls && <SearchBox
           accessToken={accessToken}
           map={map.current}
@@ -338,10 +336,11 @@ export default function Editor({ setGlobalMode, globalMode, setImageId, imageId,
 
         {showControls && <div className='controlbar top-right'>
           {mode === 'map' && <>
+            <div className='map-label' title='Format' >{IMAGE_FORMAT_NAMES[formatIndex]}</div>
             <button className='map-button icon-format' onClick={handleFormatClick} title='Format' />
             <button className='map-button icon-compass' onClick={handleCompassClick} title='Set north' />
             <button className='map-button icon-grid' onClick={handleGridClick} title='Show gridlines' />
-            <button className='map-button icon-fullscreen' onClick={handleFullscreenClick} title='Fullscreen' />
+            <button className={`map-button ${document.fullscreenElement ? 'icon-fullscreen-exit' : 'icon-fullscreen'}`} onClick={handleFullscreenClick} title='Fullscreen' />
             <button className='map-button icon-label' onClick={handleLayerClick} title='Toggle labels' />
             <button className='map-button icon-gallery' onClick={handleGalleryClick} title='Open gallery' />
             <button className='map-button icon-edit' onClick={handleCreateClick} title='Edit & publish' />
