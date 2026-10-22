@@ -19,5 +19,5 @@ export function getCookie(name, defaultValue) {
     return matches ? decodeURIComponent(matches[1]) : defaultValue;
 }
 
-export const IMAGE_FORMATS = ['16/9', '3/2', '297/210', '4/3'];
-export const IMAGE_FORMAT_NAMES = ['Widescreen 16/9', 'Photo 15x10', 'A4', 'Fullscreen 4/3'];
+export const IMAGE_FORMATS = ['16/9', '21/9', '4/3', '3/2', '297/210'];
+export const IMAGE_FORMAT_NAMES = ['Widescreen 16/9', 'Ultrawide screen 21/9', 'Fullscreen 4/3', 'Photo 15x10', 'A4'];
