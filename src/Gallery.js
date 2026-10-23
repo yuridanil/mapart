@@ -105,7 +105,7 @@ export default function Gallery({ setGlobalMode, globalMode, setImageId, imageId
             </div>
             {(imageIdx > -1) &&
                 <div className='image-open' onClick={handleCloseImageClick} onWheel={handleWheel}>
-                    <div className='gal-img-wrap-open' style={{ backgroundImage: `url(http://localhost:8080/image?id=${images[imageIdx].id}` }}>
+                    <div className='gal-img-wrap-open' style={{ backgroundImage: `url(http://localhost:8080/image?id=${images[imageIdx].id}`, aspectRatio: `${images[imageIdx].width / images[imageIdx].height}` }}>
                         <p className='gal-title-open' onClick={e => {
                             setMapOptions({ lat: images[imageIdx].lat, lng: images[imageIdx].lng, zoom: images[imageIdx].zoom, bearing: images[imageIdx].bearing });
                             e.stopPropagation();
