@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useSearchParams } from 'react';
+import { useState } from 'react';
 import Editor from './Editor';
 import Gallery from './Gallery';
 import { getCookie, setCookie } from './utils.js';
